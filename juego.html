@@ -1,497 +1,661 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="es">
-
 <head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EL DESAFÍO DEL BIBLIOMAGO — Librería Tertulia</title>
 
-<meta charset="UTF-8">
-
-<title>Arcade del Bibliomago</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
-
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-
-body {
-
-  margin: 0;
-
-  background: #000;
-
-  color: #00ffcc;
-
-  font-family: 'Press Start 2P', monospace;
-
-  display: flex;
-
-  justify-content: center;
-
-  align-items: center;
-
-  height: 100vh;
-
-  overflow: hidden;
-
-}
-
-
-.screen {
-
-  width: 90%;
-
-  max-width: 850px;
-
-  min-height: 520px;
-
-  border: 4px solid #00ffcc;
-
-  padding: 20px;
-
-  box-shadow: 0 0 20px #00ffcc;
-
-  position: relative;
-
-  background: radial-gradient(circle at center, #021b1b 0%, #000 70%);
-
-}
-
-
-.hidden { display: none; }
-
-
-h1, h2 {
-
-  text-align: center;
-
-  animation: glow 1s infinite alternate;
-
-}
-
-
-@keyframes glow {
-
-  from { text-shadow: 0 0 5px #00ffcc; }
-
-  to { text-shadow: 0 0 20px #00ffcc; }
-
-}
-
-
-.menu button, .options button {
-
-  display: block;
-
-  margin: 15px auto;
-
-  padding: 12px;
-
-  width: 90%;
-
-  background: black;
-
-  color: #00ffcc;
-
-  border: 2px solid #00ffcc;
-
-  font-family: 'Press Start 2P';
-
-  cursor: pointer;
-
-}
-
-
-.menu button:hover, .options button:hover {
-
-  background: #00ffcc;
-
-  color: black;
-
-}
-
-
-.pixel-box {
-
-  border: 2px dashed #00ffcc;
-
-  padding: 20px;
-
-  text-align: center;
-
-  margin: 20px 0;
-
-  min-height: 100px;
-
-}
-
-
-.stats {
-
-  display: flex;
-
-  justify-content: space-between;
-
-  margin-bottom: 10px;
-
-  font-size: 12px;
-
-}
-
-
-#lives { color: red; }
-
-#score { color: #00ffcc; }
-
-
-.ranking div {
-
-  margin: 10px 0;
-
-  padding: 10px;
-
-  border: 1px solid #00ffcc;
-
-}
-
-
-.gold { color: gold; border: 2px solid gold; }
-
-.silver { color: silver; border: 2px solid silver; }
-
-.bronze { color: #cd7f32; border: 2px solid #cd7f32; }
-
-
-.footer {
-
-  text-align: center;
-
-  font-size: 10px;
-
-  margin-top: 10px;
-
-}
-
+  :root{
+    --neon:#7ef9ff;
+    --neon-2:#ff7ef9;
+    --dark:#071018;
+    --paper:#EDE0C8;
+    --accent:#ffd166;
+  }
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#04121a 0%, #071018 60%, #0b0b0b 100%);font-family:'Press Start 2P', monospace;color:var(--neon);}
+  .wrap{max-width:1000px;margin:20px auto;padding:18px;border:4px double rgba(255,255,255,0.03);box-shadow:0 0 40px rgba(0,255,200,0.04);min-height:640px;background:linear-gradient(180deg, rgba(2,10,12,0.5), rgba(0,0,0,0.6));position:relative;overflow:hidden;border-radius:14px;}
+  header{ text-align:center;padding-top:6px;}
+  h1{font-size:28px;margin:6px 0;color:var(--neon);text-shadow:0 0 12px rgba(126,249,255,0.2), 0 0 24px rgba(255,126,249,0.06);letter-spacing:1px;}
+  .subtitle{font-size:10px;color:#bfeeee;margin-bottom:6px;}
+  .marque{font-size:10px;color:#ffd;opacity:0.9;margin-bottom:10px;}
+  .top3{display:flex;justify-content:center;gap:8px;margin:12px 0;}
+  .podium{width:160px;padding:8px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.2));text-align:center;box-shadow:0 0 20px rgba(0,0,0,0.6);}
+  .gold{color:gold;text-shadow:0 0 12px rgba(255,215,0,0.4);}
+  .silver{color:silver;text-shadow:0 0 12px rgba(200,200,255,0.12);}
+  .bronze{color:#ffb07c;text-shadow:0 0 12px rgba(255,160,120,0.12);}
+  .buttons{display:flex;justify-content:center;gap:12px;margin:12px 0;}
+  button.big{padding:14px 18px;background:transparent;border:2px solid var(--neon);color:var(--neon);cursor:pointer;border-radius:8px;min-width:140px;}
+  button.big:hover{background:var(--neon);color:#000;transform:translateY(-2px);box-shadow:0 0 30px rgba(126,249,255,0.12);}
+  #particle-canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:0.9;}
+  main{position:relative;z-index:2;padding:10px;}
+  /* Game area */
+  .game-screen{display:none;padding:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.2));border-radius:8px;min-height:420px;}
+  .stats{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;}
+  .lives{color:#ff6b6b;}
+  .score{color:var(--accent);}
+  .clue{background:linear-gradient(180deg,#0b1919, #081010);border:2px dashed rgba(126,249,255,0.08);padding:18px;border-radius:6px;min-height:90px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#dff; text-align:center;}
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+  .opt{padding:12px;border:2px solid var(--neon);background:rgba(0,0,0,0.2);cursor:pointer;border-radius:6px;text-align:center;}
+  .opt:hover{background:var(--neon);color:#000;transform:translateY(-2px);}
+  .progressWrap{margin-top:12px;background:rgba(255,255,255,0.03);height:24px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.03);}
+  .progressBar{height:100%;width:0%;background:linear-gradient(90deg,var(--neon),var(--neon-2));transition:width 450ms ease;}
+  .progressText{font-size:10px;margin-top:6px;text-align:center;color:#cde;}
+  .footerSmall{font-size:10px;color:#9ff;margin-top:8px;text-align:center;}
+
+  /* popup ranking */
+  .overlay{position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:9999;}
+  .card{background:linear-gradient(180deg,#061518,#0a0a0a);padding:18px;border-radius:10px;min-width:320px;color:var(--neon);box-shadow:0 0 30px rgba(0,255,200,0.04);}
+  .ranklist{max-height:360px;overflow:auto;margin-top:8px;}
+  .rankItem{padding:8px;border-bottom:1px dashed rgba(255,255,255,0.03);display:flex;justify-content:space-between;align-items:center;}
+  .rankMedal{font-size:16px;margin-right:6px;}
+
+  /* estampa */
+  .stamp{width:720px;max-width:90vw;background:linear-gradient(180deg,#f8efd9,#e4d7b0);padding:20px;border-radius:10px;color:#111;font-family:Arial, Helvetica, sans-serif;text-align:center;display:none;}
+  .stamp h2{margin:6px 0;color:#2a2a2a;}
+  .stamp .meta{font-size:14px;color:#333;margin-top:8px;}
+
+  /* responsive small */
+  @media(max-width:720px){
+    h1{font-size:18px;}
+    .top3{flex-direction:column;align-items:center;}
+    .podium{width:90%;}
+    .options{grid-template-columns:1fr;}
+    .stamp{width:92vw}
+  }
 </style>
 
 </head>
-
 <body>
 
+<div class="wrap">
+  <canvas id="particle-canvas"></canvas>
 
-<div class="screen">
+  <header>
+    <h1>EL DESAFÍO DEL BIBLIOMAGO</h1>
+    <div class="subtitle">“Solo los elegidos descifran las páginas del destino…”</div>
+    <div class="marque">Librería Tertulia – Arcade Retro – 2025</div>
 
+    <div class="top3">
+      <div class="podium gold" id="p1">🥇 Bibliomago Supremo — —</div>
+      <div class="podium silver" id="p2">🥈 Gran Erudito Arcano — —</div>
+      <div class="podium bronze" id="p3">🥉 Aprendiz Ilustre — —</div>
+    </div>
 
-<!-- ===== MENU ===== -->
+    <div class="buttons">
+      <button class="big" id="startBtn">▶ START</button>
+      <button class="big" id="recordsBtn">🏆 RÉCORDS</button>
+      <button class="big" id="rulesBtn">📜 REGLAS</button>
+      <button class="big" id="musicBtn">🔊 MÚSICA</button>
+    </div>
+  </header>
 
-<div id="menu" class="menu">
+  <main>
+    <!-- GAME -->
+    <div class="game-screen" id="gameScreen">
+      <div class="stats">
+        <div class="lives">Vidas: <span id="lives">♥︎ ♥︎ ♥︎ ♥︎ ♥︎ ♥︎</span></div>
+        <div class="score">Puntos: <span id="score">0</span></div>
+      </div>
 
-  <h1>📚 ARCADE DEL BIBLIOMAGO</h1>
+      <div class="clue" id="clue">Aquí aparecerá la pista o silueta del libro...</div>
 
-  <h2>TÉRTULO MABÓN</h2>
+      <div class="options" id="options"></div>
 
+      <div class="progressWrap">
+        <div class="progressBar" id="progressBar"></div>
+      </div>
+      <div class="progressText" id="progressText">0 / 50 — Rango: Ninguno</div>
 
-  <button onclick="startGame()">▶ START GAME</button>
+      <div class="footerSmall">Responde correctamente para avanzar. ¡Buena suerte, lector!</div>
+    </div>
 
-  <button onclick="showRanking()">🏆 RECORDS</button>
+    <!-- POP-UPS -->
+    <div class="overlay" id="overlayRecords">
+      <div class="card">
+        <h3>🏆 TOP 10 — RÉCORDS</h3>
+        <div class="ranklist" id="ranklist"></div>
+        <div style="text-align:center;margin-top:8px;"><button class="big" onclick="closeOverlay('overlayRecords')">Volver</button></div>
+      </div>
+    </div>
 
-  <button onclick="showInstructions()">📜 INSTRUCCIONES</button>
+    <div class="overlay" id="overlayRules">
+      <div class="card">
+        <h3>📜 REGLAS</h3>
+        <p style="font-size:12px;color:#bfe">• 50 preguntas por partida (aleatorias respetando dificultad).<br>
+        • No avanzas hasta responder correctamente.<br>
+        • 6 vidas totales; cada error resta 1 vida.<br>
+        • Rangos por avance: 25 / 40 / 50.<br>
+        • Si quedas Top 3, se generará una estampa descargable.<br>
+        • Puedes pausar/activar música con el botón MÚSICA.<br>
+        </p>
+        <div style="text-align:center;margin-top:8px;"><button class="big" onclick="closeOverlay('overlayRules')">Volver</button></div>
+      </div>
+    </div>
 
+    <!-- POST-GAME name input for ranking if needed -->
+    <div class="overlay" id="overlayName">
+      <div class="card">
+        <h3>¡Has entrado al TOP 10!</h3>
+        <p>Escribe tu nombre (máx 20 caracteres):</p>
+        <input id="playerName" style="width:100%;padding:10px;margin-bottom:8px;font-family:monospace">
+        <div style="display:flex;gap:8px;justify-content:center;">
+          <button class="big" onclick="submitName()">Guardar</button>
+          <button class="big" onclick="closeOverlay('overlayName')">Cancelar</button>
+        </div>
+      </div>
+    </div>
 
-  <p style="text-align:center;margin-top:20px;">
+    <!-- STAMP -->
+    <div style="text-align:center;margin-top:14px;">
+      <div id="stampArea" style="display:none;">
+        <div class="stamp" id="stampCard">
+          <h2 id="stampTitle">Bibliomago Supremo</h2>
+          <div style="font-weight:bold;font-size:20px" id="stampName">Jugador</div>
+          <div class="meta" id="stampMeta">Puntaje: 1200 — 2025</div>
+          <div style="margin-top:14px;"><button class="big" id="downloadStampBtn">📥 Descargar</button> <button class="big" id="shareStampBtn">📤 Compartir</button> <button class="big" onclick="resetToMenu()">🔁 Volver</button></div>
+        </div>
+      </div>
+    </div>
 
-    “Todo sabio será probado en la biblioteca del destino”
-
-  </p>
-
+  </main>
 </div>
 
+<!-- Audio elements (use your own files or URLs) -->
+<audio id="bgMusic" loop>
+  <source src="musica.mp3" type="audio/mpeg">
+</audio>
+<audio id="sOk"><source src="ok.mp3" type="audio/mpeg"></audio>
+<audio id="sErr"><source src="error.mp3" type="audio/mpeg"></audio>
+<audio id="sLife"><source src="life.mp3" type="audio/mpeg"></audio>
+<audio id="sRank"><source src="rankup.mp3" type="audio/mpeg"></audio>
+<audio id="sWin"><source src="win.mp3" type="audio/mpeg"></audio>
 
+<!-- Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-<!-- ===== GAME ===== -->
-
-<div id="game" class="hidden">
-
-  <div class="stats">
-
-    <div>Vidas: <span id="lives">❤️❤️❤️</span></div>
-
-    <div>Puntos: <span id="score">0</span></div>
-
-  </div>
-
-
-  <div class="pixel-box" id="clue"></div>
-
-
-  <div class="options">
-
-    <button onclick="checkAnswer(0)" id="opt0"></button>
-
-    <button onclick="checkAnswer(1)" id="opt1"></button>
-
-    <button onclick="checkAnswer(2)" id="opt2"></button>
-
-    <button onclick="checkAnswer(3)" id="opt3"></button>
-
-  </div>
-
-</div>
-
-
-
-<!-- ===== NAME INPUT ===== -->
-
-<div id="nameScreen" class="hidden">
-
-  <h2>Has entrado al TOP 7 🧙‍♂️</h2>
-
-  <p>Escribe tu nombre para guardarlo en los registros:</p>
-
-  <input id="playerName" placeholder="Tu nombre..." style="width:100%;padding:10px;font-family:'Press Start 2P'">
-
-  <button onclick="saveScore()">GUARDAR</button>
-
-</div>
-
-
-
-<!-- ===== RANKING ===== -->
-
-<div id="ranking" class="hidden">
-
-  <h2>🏆 TOP 7 LECTORES</h2>
-
-  <div class="ranking" id="rankingList"></div>
-
-  <button onclick="goMenu()">Volver</button>
-
-</div>
-
-
-
-<!-- ===== INSTRUCTIONS ===== -->
-
-<div id="instructions" class="hidden">
-
-  <h2>📜 INSTRUCCIONES</h2>
-
-  <p>Adivina el libro usando la pista proporcionada.</p>
-
-  <p>Selecciona entre 4 opciones.</p>
-
-  <p>✅ Acierto: +100 puntos</p>
-
-  <p>❌ Error: Pierdes una vida</p>
-
-  <p>Si entras al TOP 7 podrás registrar tu nombre.</p>
-
-  <button onclick="goMenu()">Volver</button>
-
-</div>
-
-
-<div class="footer">Librería Tertulia © – Arcade Retro</div>
-
-
-</div>
-
-
+<!-- Optional Firebase (if quieres ranking en la nube) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
 <script>
+/* ===========================
+   CONFIGURACIONES INICIALES
+   =========================== */
 
-const questions = [
+const TOTAL_REQUIRED = 50;
+let lives = 6;
+let score = 0;
+let currentIndex = 0;
+let sequence = []; // selected 50-question sequence
+let usedQuestions = []; // indexes used
+let musicOn = false;
+let firebaseEnabled = false; // set true if you paste config and it initializes
 
-  { clue: "Una biblioteca infinita que contiene todos los libros posibles", options: ["La biblioteca de Babel","El nombre del viento","1984","La sombra del viento"], correct: 0 },
+// RANKING storage (fallback to localStorage if firebase not configured)
+let rankingLocalKey = "bibliomago_ranking_v1";
 
-  { clue: "Un mundo donde los libros están prohibidos", options: ["1984","Fahrenheit 451","Un mundo feliz","Dune"], correct: 1 },
+/* ===========================
+   PREGUNTAS (60 items)
+   20 easy / 20 medium / 20 hard
+   Each: {text, options:[...], correct:0..3, difficulty: 'easy'|'med'|'hard'}
+   =========================== */
+const QUESTIONS = [
+  /* EASY 20 */
+  {text:"¿Quién escribió 'Cien años de soledad'?", options:["Gabriel García Márquez","Mario Vargas Llosa","Pablo Neruda","Julio Cortázar"], correct:0, difficulty:"easy"},
+  {text:"¿Cuál es el autor de 'Don Quijote'?", options:["Lope de Vega","Miguel de Cervantes","Federico García Lorca","Camilo José Cela"], correct:1, difficulty:"easy"},
+  {text:"Personaje: un mago aprendiz con cicatriz. ¿Quién es?", options:["Gandalf","Merlín","Harry Potter","Dumbledore"], correct:2, difficulty:"easy"},
+  {text:"¿Cuál novela tiene un personaje llamado 'Elizabeth Bennet'?", options:["Jane Eyre","Orgullo y prejuicio","Anna Karenina","Mujercitas"], correct:1, difficulty:"easy"},
+  {text:"¿Quién escribió '1984'?", options:["Aldous Huxley","George Orwell","Ray Bradbury","H. G. Wells"], correct:1, difficulty:"easy"},
+  {text:"Objeto icónico: un anillo que domina. ¿A qué saga pertenece?", options:["Narnia","El Señor de los Anillos","Harry Potter","Crónicas de la Dragonlance"], correct:1, difficulty:"easy"},
+  {text:"¿Qué autor escribió 'El Principito'?", options:["Antoine de Saint-Exupéry","Victor Hugo","Albert Camus","Émile Zola"], correct:0, difficulty:"easy"},
+  {text:"¿Quién es el autor de 'La sombra del viento'?", options:["Carlos Ruiz Zafón","Isabel Allende","Paulo Coelho","Javier Cercas"], correct:0, difficulty:"easy"},
+  {text:"Objeto: ¿Quién creó a 'Frankenstein' (novela)?", options:["Bram Stoker","Mary Shelley","Edgar Allan Poe","H. P. Lovecraft"], correct:1, difficulty:"easy"},
+  {text:"Personaje: Sherlock Holmes. ¿Quién es su creador?", options:["Agatha Christie","Arthur Conan Doyle","Edgar Wallace","Daphne du Maurier"], correct:1, difficulty:"easy"},
+  {text:"¿Qué libro comienza con 'Call me Ishmael'?", options:["Moby Dick","El viejo y el mar","La Odisea","El guardián entre el centeno"], correct:0, difficulty:"easy"},
+  {text:"¿Cuál es la trilogía de la Tierra Media de mayor fama?", options:["El Hobbit","El Señor de los Anillos","Las Crónicas de Narnia","La Rueda del Tiempo"], correct:1, difficulty:"easy"},
+  {text:"Autor: 'Romeo y Julieta' pertenece a...", options:["Goethe","William Shakespeare","Lope de Vega","Tennessee Williams"], correct:1, difficulty:"easy"},
+  {text:"¿Qué libro tiene a Katniss Everdeen como protagonista?", options:["Divergente","Los juegos del hambre","Percy Jackson","Maze Runner"], correct:1, difficulty:"easy"},
+  {text:"¿Quién escribió 'El nombre del viento'?", options:["Patrick Rothfuss","Brandon Sanderson","George R. R. Martin","Ursula K. Le Guin"], correct:0, difficulty:"easy"},
+  {text:"Objeto literario: 'La pluma que escribe destinos' aparece en qué tipo de historias?", options:["Realismo contemporáneo","Fantasía","No ficción","Ensayo"], correct:1, difficulty:"easy"},
+  {text:"¿Quién escribió 'Fahrenheit 451'?", options:["Ray Bradbury","George Orwell","Kurt Vonnegut","Philip K. Dick"], correct:0, difficulty:"easy"},
+  {text:"¿La saga 'Harry Potter' fue escrita por...?", options:["J.K. Rowling","C.S. Lewis","J.R.R. Tolkien","Suzanne Collins"], correct:0, difficulty:"easy"},
+  {text:"Personaje: 'Atticus Finch' pertenece a...", options:["Matar a un ruiseñor","El gran Gatsby","To Kill a Mockingbird","Ambas A y C"], correct:2, difficulty:"easy"},
+  {text:"¿Cuál obra es de Julio Cortázar?", options:["Rayuela","Cien años de soledad","Pedro Páramo","El amor en los tiempos del cólera"], correct:0, difficulty:"easy"},
 
-  { clue: "Un niño mago con cicatriz en la frente", options: ["El Hobbit","Percy Jackson","Harry Potter","Narnia"], correct: 2 },
+  /* MEDIUM 20 */
+  {text:"¿Qué autor escribió 'Beloved'?", options:["Toni Morrison","Alice Walker","Zadie Smith","Chimamanda Ngozi Adichie"], correct:0, difficulty:"med"},
+  {text:"Objeto: 'Un grimorio con páginas en blanco que reflejan deseos' es típico de...", options:["Realismo mágico","Fantasía oscura","Ensayo","Novela histórica"], correct:1, difficulty:"med"},
+  {text:"¿Quién escribió 'El perfume'?", options:["Patrick Süskind","Thomas Mann","Stefan Zweig","Hermann Hesse"], correct:0, difficulty:"med"},
+  {text:"Personaje: 'Humbert Humbert' aparece en...", options:["Lolita","Mrs Dalloway","La metamorfosis","El ruido y la furia"], correct:0, difficulty:"med"},
+  {text:"¿Quién es el autor de 'Crimen y castigo'?", options:["Dostoyevski","Tolstói","Chejov","Gógol"], correct:0, difficulty:"med"},
+  {text:"¿Qué obra es de Virginia Woolf?", options:["Mrs Dalloway","El gran Gatsby","El guardián entre el centeno","La carretera"], correct:0, difficulty:"med"},
+  {text:"Objeto: 'Un espejo que muestra vidas alternativas' pertenece a...", options:["Literatura fantástica","Filosofía","No ficción","Manual técnico"], correct:0, difficulty:"med"},
+  {text:"¿Qué novela presenta a Meursault como protagonista?", options:["El extranjero","La náusea","La peste","Los hermanos Karamázov"], correct:0, difficulty:"med"},
+  {text:"¿Quién escribió 'El Señor Presidente'?", options:["Miguel Ángel Asturias","Gabriel García Márquez","Rómulo Gallegos","Alejo Carpentier"], correct:0, difficulty:"med"},
+  {text:"Personaje: 'Jean Valjean' aparece en...", options:["Los Miserables","Candide","Madame Bovary","El retrato de Dorian Gray"], correct:0, difficulty:"med"},
+  {text:"¿Cuál escritor es sinonimo de 'realismo mágico' en Latinoamérica?", options:["García Márquez","Borges","Paz","Rulfo"], correct:0, difficulty:"med"},
+  {text:"Objeto: 'Una carta sin remitente que cambia destinos' es recurso de...", options:["Novela epistolar","Poesía","Teatro","Ensayos"], correct:0, difficulty:"med"},
+  {text:"¿Quién escribió 'Ana Karénina'?", options:["León Tolstói","Fiódor Dostoyevski","Lev Tolstói","Nikolái Gogol"], correct:0, difficulty:"med"},
+  {text:"¿Qué autor planteó 'El Aleph'?", options:["Jorge Luis Borges","Octavio Paz","Pablo Neruda","Julio Cortázar"], correct:0, difficulty:"med"},
+  {text:"Personaje: 'Lyra Belacqua' es de...", options:["His Dark Materials","Percy Jackson","Harry Potter","Narnia"], correct:0, difficulty:"med"},
+  {text:"¿Quién escribió 'La carretera'?", options:["Cormac McCarthy","Stephen King","John Steinbeck","Don DeLillo"], correct:0, difficulty:"med"},
+  {text:"Objeto: 'Una brújula que apunta a recuerdos' aparece en...", options:["Fantasía","No ficción","Manual","Crónica"], correct:0, difficulty:"med"},
+  {text:"¿Qué obra es de Isabel Allende?", options:["La casa de los espíritus","Pedro Páramo","El túnel","La colmena"], correct:0, difficulty:"med"},
+  {text:"Personaje: 'Rand al'Thor' pertenece a qué saga?", options:["La Rueda del Tiempo","Dune","Fundación","El Archivo"], correct:0, difficulty:"med"},
+  {text:"¿Quién escribió 'Los heraldos negros' (poemas)?", options:["Cesar Vallejo","Pablo Neruda","Octavio Paz","Federico García Lorca"], correct:0, difficulty:"med"},
 
-  { clue: "Un anillo que domina a todos", options: ["Eragon","El Señor de los Anillos","It","Juego de Tronos"], correct: 1 },
-
-  { clue: "Un hotel y una presencia oscura", options: ["El Resplandor","Misery","Drácula","Carrie"], correct: 0 },
-
-  { clue: "Un virus destruye la humanidad", options: ["Soy leyenda","Metro 2033","La carretera","Maze Runner"], correct: 0 },
-
-  { clue: "Una competencia mortal entre distritos", options: ["Divergente","Battle Royale","Los juegos del hambre","Maze Runner"], correct: 2 },
-
-  { clue: "Un músico pelirrojo cuenta su historia", options: ["Fundación","El nombre del viento","Elantris","Dune"], correct: 1 },
-
-  { clue: "Libros ocultos en un cementerio", options: ["El perfume","La sombra del viento","Inferno","El código Da Vinci"], correct: 1 },
-
-  { clue: "Un payaso aterroriza un pueblo", options: ["Cujo","Carrie","It","Salem’s Lot"], correct: 2 }
-
+  /* HARD 20 */
+  {text:"¿Qué novelista escribió 'La muerte de Artemio Cruz'?", options:["Carlos Fuentes","Octavio Paz","Juan Rulfo","Carlos Monsiváis"], correct:0, difficulty:"hard"},
+  {text:"Objeto: 'Un códice que solo leen sombras' aparece en novela de...", options:["Fantasía gótica","Realismo","Ensayo histórico","Manual"], correct:0, difficulty:"hard"},
+  {text:"Personaje: 'Molloy, Malone, The Unnamable' aparecen en obras de...", options:["Samuel Beckett","Franz Kafka","Albert Camus","Thomas Bernhard"], correct:0, difficulty:"hard"},
+  {text:"¿Quién escribió 'En busca del tiempo perdido'?", options:["Marcel Proust","James Joyce","Virginia Woolf","Franz Kafka"], correct:0, difficulty:"hard"},
+  {text:"¿Qué autor escribió 'Ulises'?", options:["James Joyce","William Faulkner","Samuel Beckett","Vladimir Nabokov"], correct:0, difficulty:"hard"},
+  {text:"¿Cuál obra es de Nabokov?", options:["Lolita","El extranjero","El amor en los tiempos del cólera","El señor de las moscas"], correct:0, difficulty:"hard"},
+  {text:"Personaje: 'Stephen Dedalus' aparece en...", options:["Retrato del artista adolescente","Ulises","Mrs Dalloway","Ambas A y B"], correct:3, difficulty:"hard"},
+  {text:"¿Quién escribió 'La náusea'?", options:["Jean-Paul Sartre","Albert Camus","Simone de Beauvoir","Samuel Beckett"], correct:1, difficulty:"hard"},
+  {text:"Objeto: 'Un espejo que devora nombres' — recurso típico de...", options:["Fantasía oscura","Monografía","Ciencia política","Guía"], correct:0, difficulty:"hard"},
+  {text:"¿Qué autor escribió 'La muerte de Ivan Illich'?", options:["Leo Tolstoy","Boris Pasternak","Lev Tolstói","Nikolái Leskov"], correct:0, difficulty:"hard"},
+  {text:"Personaje: 'Offred' es protagonista de...", options:["El cuento de la criada","El extranjero","La colmena","La casa verde"], correct:0, difficulty:"hard"},
+  {text:"¿Quién escribió 'Pedro Páramo'?", options:["Juan Rulfo","Carlos Fuentes","Octavio Paz","Alejo Carpentier"], correct:0, difficulty:"hard"},
+  {text:"¿Qué novela escribió Thomas Mann famosa por un doctor?", options:["La montaña mágica","Muerte en Venecia","Los Buddenbrook","Hans Castorp"], correct:0, difficulty:"hard"},
+  {text:"Personaje: 'Randall Flagg' aparece en obras de...", options:["Stephen King","Clive Barker","Neil Gaiman","H.P. Lovecraft"], correct:0, difficulty:"hard"},
+  {text:"¿Quién escribió 'El proceso'?", options:["Franz Kafka","Joseph Conrad","Herman Melville","Gustave Flaubert"], correct:0, difficulty:"hard"},
+  {text:"Objeto: 'Un diario que escribe el futuro' aparece en historias de...", options:["Ciencia ficción","Manual escolar","Recetas","Ensayo"], correct:0, difficulty:"hard"},
+  {text:"¿Qué autor creó la figura de 'Raskolnikov'?", options:["Fiódor Dostoyevski","León Tolstói","Antón Chéjov","Nicolás Gogol"], correct:0, difficulty:"hard"},
+  {text:"Personaje: 'Stanisław Wokulski' aparece en...", options:["Lalka (El sombrero)","El gran Gatsby","El idiota","Guerra y paz"], correct:0, difficulty:"hard"},
+  {text:"¿Quién escribió 'La invención de Morel'?", options:["Adolfo Bioy Casares","Jorge Luis Borges","Alejandro Dolina","Horacio Quiroga"], correct:0, difficulty:"hard"},
+  {text:"¿Qué obra es de Clarice Lispector?", options:["La hora de la estrella","Cien años de soledad","El coronel no tiene quien le escriba","La tregua"], correct:0, difficulty:"hard"}
 ];
 
+/* ===========================
+   UTILIDADES Y SELECCIÓN DE PARTIDA
+   =========================== */
 
-let index = 0;
-
-let score = 0;
-
-let lives = 3;
-
-let ranking = JSON.parse(localStorage.getItem("rankingLibro")) || [];
-
-
-function startGame() {
-
-  index = 0; score = 0; lives = 3;
-
-  document.getElementById("menu").classList.add("hidden");
-
-  document.getElementById("game").classList.remove("hidden");
-
-  loadQuestion();
-
-}
-
-
-function loadQuestion() {
-
-  if(index >= questions.length || lives <= 0){
-
-    endGame();
-
-    return;
-
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
   }
-
-
-  let q = questions[index];
-
-  document.getElementById("clue").innerText = q.clue;
-
-  q.options.forEach((opt,i)=>{
-
-    document.getElementById("opt"+i).innerText = opt;
-
-  });
-
-
-  updateStats();
-
+  return arr;
 }
 
+function buildSequence(){
+  // split pools
+  const easy = QUESTIONS.filter(q=>q.difficulty==='easy').map((q,i)=>i);
+  const med = QUESTIONS.filter(q=>q.difficulty==='med').map((q,i)=>i);
+  const hard = QUESTIONS.filter(q=>q.difficulty==='hard').map((q,i)=>i);
+
+  // indices above map to original QUESTIONS positions; need actual indices lists
+  // We will build arrays of actual indices:
+  const easyIdx = QUESTIONS.map((q,idx)=> q.difficulty==='easy' ? idx : -1).filter(i=>i!==-1);
+  const medIdx = QUESTIONS.map((q,idx)=> q.difficulty==='med' ? idx : -1).filter(i=>i!==-1);
+  const hardIdx = QUESTIONS.map((q,idx)=> q.difficulty==='hard' ? idx : -1).filter(i=>i!==-1);
+
+  // shuffle each
+  shuffle(easyIdx); shuffle(medIdx); shuffle(hardIdx);
+
+  // pick 17 easy,17 med,16 hard
+  const pickEasy = easyIdx.slice(0,17);
+  const pickMed = medIdx.slice(0,17);
+  const pickHard = hardIdx.slice(0,16);
+
+  const combined = shuffle([...pickEasy, ...pickMed, ...pickHard]);
+  sequence = combined;
+  usedQuestions = [];
+}
+
+/* ===========================
+   UI y flujo de juego
+   =========================== */
+const startBtn = document.getElementById('startBtn');
+const recordsBtn = document.getElementById('recordsBtn');
+const rulesBtn = document.getElementById('rulesBtn');
+const musicBtn = document.getElementById('musicBtn');
+const gameScreen = document.getElementById('gameScreen');
+const clueEl = document.getElementById('clue');
+const optionsEl = document.getElementById('options');
+const livesEl = document.getElementById('lives');
+const scoreEl = document.getElementById('score');
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
+
+startBtn.addEventListener('click', ()=>{ startGame(); });
+recordsBtn.addEventListener('click', ()=>{ openOverlay('overlayRecords'); loadRankingUI(); });
+rulesBtn.addEventListener('click', ()=>{ openOverlay('overlayRules'); });
+
+musicBtn.addEventListener('click', ()=>{
+  const m = document.getElementById('bgMusic');
+  if(!musicOn){ m.volume = 0.25; m.play().catch(()=>{}); musicOn=true; musicBtn.innerText='🔊 PAUSA'; }
+  else { m.pause(); musicOn=false; musicBtn.innerText='🔊 MÚSICA'; }
+});
+
+function startGame(){
+  // reset
+  lives = 6; score=0; currentIndex=0; document.getElementById('stampArea').style.display='none';
+  updateStats();
+  buildSequence();
+  document.getElementById('overlayRecords').style.display='none';
+  document.getElementById('overlayRules').style.display='none';
+  gameScreen.style.display='block';
+  startBtn.blur();
+  loadQuestion();
+}
+
+function loadQuestion(){
+  if(currentIndex >= sequence.length || lives <= 0){
+    endGame();
+    return;
+  }
+  const qIndex = sequence[currentIndex];
+  const q = QUESTIONS[qIndex];
+  clueEl.innerText = q.text;
+  optionsEl.innerHTML = '';
+  q.options.forEach((opt,i)=>{
+    const b = document.createElement('div');
+    b.className='opt';
+    b.innerText = opt;
+    b.onclick = ()=> checkAnswer(i);
+    optionsEl.appendChild(b);
+  });
+  updateProgress();
+}
+
+function checkAnswer(choice){
+  const qIndex = sequence[currentIndex];
+  const q = QUESTIONS[qIndex];
+  if(choice === q.correct){
+    // correct
+    score += 20; // arbitrary puntuation per correct
+    playSound('sOk');
+    currentIndex++;
+    updateStats();
+    // show next question after short delay to show effect
+    setTimeout(()=>{ loadQuestion(); }, 250);
+  } else {
+    // incorrect
+    lives--;
+    playSound('sErr');
+    updateStats();
+    if(lives <= 0){ endGame(); return; }
+    // stay on same question until correct
+  }
+  checkRankMilestones();
+}
 
 function updateStats(){
-
-  document.getElementById("score").innerText = score;
-
-  document.getElementById("lives").innerText = "❤️".repeat(lives);
-
+  livesEl.innerText = '♥︎ '.repeat(lives);
+  scoreEl.innerText = score;
 }
 
+function updateProgress(){
+  const done = currentIndex;
+  const pct = Math.round((done / TOTAL_REQUIRED) * 100);
+  progressBar.style.width = pct + '%';
+  let rango = getRangeFor(done);
+  progressText.innerText = `${done} / ${TOTAL_REQUIRED} — Rango: ${rango || 'Ninguno'}`;
+}
 
-function checkAnswer(i){
+function getRangeFor(done){
+  if(done >= 50) return 'Bibliomago Supremo';
+  if(done >= 40) return 'Gran Erudito Arcano';
+  if(done >= 25) return 'Aprendiz Ilustre';
+  return null;
+}
 
-  if(i === questions[index].correct){
-
-    score += 100;
-
-  } else {
-
-    lives--;
-
+function checkRankMilestones(){
+  const done = currentIndex;
+  if(done === 25 || done === 40 || done === 50){
+    // play sound and show mini animation/pop
+    playSound('sRank');
+    flashTitle();
   }
-
-  index++;
-
-  loadQuestion();
-
 }
 
+function flashTitle(){
+  const el = document.querySelector('h1');
+  el.style.transition = 'transform 300ms ease, text-shadow 300ms';
+  el.style.transform = 'scale(1.02)';
+  setTimeout(()=>{ el.style.transform='scale(1)'; }, 300);
+}
+
+/* ===========================
+   End game & ranking flow
+   =========================== */
 
 function endGame(){
-
-  document.getElementById("game").classList.add("hidden");
-
-
-  if(ranking.length < 7 || score > ranking[ranking.length-1].score){
-
-    document.getElementById("nameScreen").classList.remove("hidden");
-
-  } else{
-
-    showRanking();
-
+  gameScreen.style.display='none';
+  // compute final score, maybe bonus for remaining lives
+  if(lives>0){
+    score += lives * 10;
+    playSound('sWin');
   }
-
-}
-
-
-function saveScore(){
-
-  let name = document.getElementById("playerName").value || "Anónimo";
-
-  ranking.push({name,score});
-
-  ranking.sort((a,b)=>b.score-a.score);
-
-  ranking = ranking.slice(0,7);
-
-  localStorage.setItem("rankingLibro", JSON.stringify(ranking));
-
-  showRanking();
-
-}
-
-
-function showRanking(){
-
-  document.getElementById("nameScreen")?.classList.add("hidden");
-
-  document.getElementById("menu").classList.add("hidden");
-
-  document.getElementById("ranking").classList.remove("hidden");
-
-
-  let list = document.getElementById("rankingList");
-
-  list.innerHTML = "";
-
-
-  ranking.forEach((r,i)=>{
-
-    const div = document.createElement("div");
-
-    if(i===0) div.classList.add("gold"), div.innerHTML = `🥇 Gran Erudito Arcano — ${r.name} (${r.score})`;
-
-    else if(i===1) div.classList.add("silver"), div.innerHTML = `🥈 Bibliomago Supremo — ${r.name} (${r.score})`;
-
-    else if(i===2) div.classList.add("bronze"), div.innerHTML = `🥉 Aprendiz Ilustre — ${r.name} (${r.score})`;
-
-    else div.innerHTML = `📚 ${r.name} — ${r.score}`;
-
-    list.appendChild(div);
-
+  // load ranking list and decide if in top 10
+  getRanking().then(list=>{
+    // list is array sorted desc {name,score,date}
+    let lowest = list.length < 10 ? 0 : list[list.length-1].score;
+    if(list.length < 10 || score > lowest){
+      // show name prompt
+      openOverlay('overlayName');
+    } else {
+      // show local ranking screen
+      openOverlay('overlayRecords');
+      renderRankingList(list);
+    }
+  }).catch(err=>{
+    // fallback: local only
+    let list = JSON.parse(localStorage.getItem(rankingLocalKey) || '[]');
+    let lowest = list.length < 10 ? 0 : list[list.length-1].score;
+    if(list.length < 10 || score > lowest) openOverlay('overlayName'); else { openOverlay('overlayRecords'); renderRankingList(list); }
   });
-
 }
 
+/* ========== overlay helpers ========== */
+function openOverlay(id){ document.getElementById(id).style.display='flex'; }
+function closeOverlay(id){ document.getElementById(id).style.display='none'; }
 
-function showInstructions(){
+/* ========== Ranking storage (Firebase optional) ========== */
 
-  document.getElementById("menu").classList.add("hidden");
+let db = null; // firestore instance
 
-  document.getElementById("instructions").classList.remove("hidden");
-
+// call this to init firebase if you paste config
+function initFirebase(firebaseConfig){
+  if(!firebaseConfig) return;
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  firebaseEnabled = true;
 }
 
-
-function goMenu(){
-
-  document.getElementById("ranking").classList.add("hidden");
-
-  document.getElementById("instructions").classList.add("hidden");
-
-  document.getElementById("menu").classList.remove("hidden");
-
+// If firebaseEnabled use cloud, else localStorage
+async function getRanking(){
+  if(firebaseEnabled && db){
+    const snap = await db.collection('ranking').orderBy('score','desc').limit(10).get();
+    const arr = [];
+    snap.forEach(doc => arr.push(doc.data()));
+    return arr;
+  } else {
+    const raw = localStorage.getItem(rankingLocalKey) || '[]';
+    return JSON.parse(raw);
+  }
 }
+
+async function submitToRanking(name){
+  const entry = {name: name.slice(0,20), score: score, date: new Date().toISOString()};
+  if(firebaseEnabled && db){
+    await db.collection('ranking').add(entry);
+    // after add, fetch latest and render
+    const list = await getRanking();
+    renderRankingList(list);
+    closeOverlay('overlayName');
+    showStampIfElite(name);
+  } else {
+    // local fallback
+    const arr = JSON.parse(localStorage.getItem(rankingLocalKey) || '[]');
+    arr.push(entry);
+    arr.sort((a,b)=>b.score-a.score);
+    const top = arr.slice(0,10);
+    localStorage.setItem(rankingLocalKey, JSON.stringify(top));
+    renderRankingList(top);
+    closeOverlay('overlayName');
+    showStampIfElite(name);
+  }
+}
+
+function submitName(){ const name = document.getElementById('playerName').value || 'Anónimo'; submitToRanking(name); }
+
+/* ========== UI ranking render ========== */
+async function loadRankingUI(){
+  try{
+    const list = await getRanking();
+    renderRankingList(list);
+  } catch(e){
+    const arr = JSON.parse(localStorage.getItem(rankingLocalKey) || '[]');
+    renderRankingList(arr);
+  }
+}
+
+function renderRankingList(list){
+  const container = document.getElementById('ranklist');
+  container.innerHTML = '';
+  list.forEach((r,i)=>{
+    const div = document.createElement('div');
+    div.className='rankItem';
+    const medal = i===0 ? '🥇' : i===1 ? '🥈' : i===2 ? '🥉' : '📚';
+    const style = i===0 ? 'gold' : i===1 ? 'silver' : i===2 ? 'bronze' : '';
+    div.innerHTML = `<div><span class="rankMedal">${medal}</span><strong class="${style}">${r.name}</strong></div><div>${r.score}</div>`;
+    container.appendChild(div);
+    // also show top3 on main header
+    if(i===0) document.getElementById('p1').innerText=`🥇 ${r.name} — ${r.score}`;
+    if(i===1) document.getElementById('p2').innerText=`🥈 ${r.name} — ${r.score}`;
+    if(i===2) document.getElementById('p3').innerText=`🥉 ${r.name} — ${r.score}`;
+  });
+  openOverlay('overlayRecords');
+}
+
+/* ===========================
+   Stamps (generate image) using html2canvas
+   =========================== */
+function showStampIfElite(name){
+  // check whether in top 3
+  getRanking().then(list=>{
+    const idx = list.findIndex(e=>e.name===name && e.score===score);
+    if(idx>=0 && idx<=2){
+      // show stamp area
+      document.getElementById('stampArea').style.display='block';
+      document.getElementById('stampCard').style.display='block';
+      const rankText = idx===0 ? 'Bibliomago Supremo' : idx===1 ? 'Gran Erudito Arcano' : 'Aprendiz Ilustre';
+      document.getElementById('stampTitle').innerText = rankText;
+      document.getElementById('stampName').innerText = name;
+      document.getElementById('stampMeta').innerText = `Puntaje: ${score} — 2025`;
+      // attach download/share
+      document.getElementById('downloadStampBtn').onclick = ()=> {
+        html2canvas(document.getElementById('stampCard')).then(canvas=>{
+          const link = document.createElement('a');
+          link.download = `estampa-${name.replace(/\s+/g,'_')}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        });
+      };
+      document.getElementById('shareStampBtn').onclick = async ()=>{
+        try{
+          const canvas = await html2canvas(document.getElementById('stampCard'));
+          const dataUrl = canvas.toDataURL('image/png');
+          const blob = await (await fetch(dataUrl)).blob();
+          const filesArray = [new File([blob], `estampa-${name}.png`, {type: 'image/png'})];
+          if(navigator.canShare && navigator.canShare({files: filesArray})){
+            navigator.share({files: filesArray, title:'Mi estampa literaria', text:`Soy ${rankText} en El Desafío del Bibliomago — ${score} pts`});
+          } else {
+            alert('Compartir directo no está disponible en este dispositivo. Descarga la imagen y compártela manualmente.');
+          }
+        }catch(e){ alert('No fue posible compartir: '+e.message); }
+      };
+    } else {
+      // not elite: show records
+      openOverlay('overlayRecords');
+    }
+  });
+}
+
+function resetToMenu(){
+  document.getElementById('stampArea').style.display='none';
+  document.getElementById('stampCard').style.display='none';
+  closeOverlay('overlayRecords');
+  closeOverlay('overlayName');
+  closeOverlay('overlayRules');
+  gameScreen.style.display='none';
+}
+
+/* ===========================
+   Sounds utility
+   =========================== */
+function playSound(id){
+  try{
+    const a = document.getElementById(id);
+    if(a){ a.currentTime = 0; a.play().catch(()=>{}); }
+  }catch(e){}
+}
+
+/* ===========================
+   Particles background (simple)
+   =========================== */
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+function resizeCanvas(){ canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; }
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+const particles = [];
+function spawnParticle(){
+  particles.push({
+    x: Math.random()*canvas.width,
+    y: canvas.height + 10,
+    vx: (Math.random()-0.5)*0.6,
+    vy: - (0.2 + Math.random()*1.2),
+    life: 200 + Math.random()*300,
+    size: 1 + Math.random()*3,
+    hue: Math.random()*360
+  });
+}
+setInterval(()=>{ if(particles.length<80 && Math.random()>0.5) spawnParticle(); },120);
+function updateParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy; p.life--;
+    ctx.beginPath();
+    const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*8);
+    g.addColorStop(0,'rgba(126,249,255,0.9)');
+    g.addColorStop(1,'rgba(255,126,249,0.02)');
+    ctx.fillStyle = g;
+    ctx.fillRect(p.x-p.size, p.y-p.size, p.size*2, p.size*2);
+    if(p.life<=0 || p.y < -50) particles.splice(i,1);
+  }
+  requestAnimationFrame(updateParticles);
+}
+updateParticles();
+
+/* ===========================
+   OPTIONAL: FIREBASE CONFIG
+   - If you want cloud ranking, paste your firebase config below
+   - Example:
+   const firebaseConfig = {
+     apiKey: "xxx",
+     authDomain: "xxx.firebaseapp.com",
+     projectId: "xxx",
+     storageBucket: "xxx.appspot.com",
+     messagingSenderId: "xxx",
+     appId: "xxx"
+   };
+   initFirebase(firebaseConfig);
+   =========================== */
+
+// --- PASTE YOUR FIREBASE CONFIG BELOW AND UNCOMMENT initFirebase(...) ---
+// const firebaseConfig = { /* YOUR FIREBASE CONFIG HERE */ };
+// if(firebaseConfig && firebaseConfig.apiKey) initFirebase(firebaseConfig);
 
 </script>
 
-
 </body>
-
 </html>
-}
+
