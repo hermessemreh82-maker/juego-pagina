@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Arcade del Bibliomago</title>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+
+body {
+
+  margin: 0;
+
+  background: #000;
+
+  color: #00ffcc;
+
+  font-family: 'Press Start 2P', monospace;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  height: 100vh;
+
+  overflow: hidden;
+
+}
+
+
+.screen {
+
+  width: 90%;
+
+  max-width: 850px;
+
+  min-height: 520px;
+
+  border: 4px solid #00ffcc;
+
+  padding: 20px;
+
+  box-shadow: 0 0 20px #00ffcc;
+
+  position: relative;
+
+  background: radial-gradient(circle at center, #021b1b 0%, #000 70%);
+
+}
+
+
+.hidden { display: none; }
+
+
+h1, h2 {
+
+  text-align: center;
+
+  animation: glow 1s infinite alternate;
+
+}
+
+
+@keyframes glow {
+
+  from { text-shadow: 0 0 5px #00ffcc; }
+
+  to { text-shadow: 0 0 20px #00ffcc; }
+
+}
+
+
+.menu button, .options button {
+
+  display: block;
+
+  margin: 15px auto;
+
+  padding: 12px;
+
+  width: 90%;
+
+  background: black;
+
+  color: #00ffcc;
+
+  border: 2px solid #00ffcc;
+
+  font-family: 'Press Start 2P';
+
+  cursor: pointer;
+
+}
+
+
+.menu button:hover, .options button:hover {
+
+  background: #00ffcc;
+
+  color: black;
+
+}
+
+
+.pixel-box {
+
+  border: 2px dashed #00ffcc;
+
+  padding: 20px;
+
+  text-align: center;
+
+  margin: 20px 0;
+
+  min-height: 100px;
+
+}
+
+
+.stats {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  margin-bottom: 10px;
+
+  font-size: 12px;
+
+}
+
+
+#lives { color: red; }
+
+#score { color: #00ffcc; }
+
+
+.ranking div {
+
+  margin: 10px 0;
+
+  padding: 10px;
+
+  border: 1px solid #00ffcc;
+
+}
+
+
+.gold { color: gold; border: 2px solid gold; }
+
+.silver { color: silver; border: 2px solid silver; }
+
+.bronze { color: #cd7f32; border: 2px solid #cd7f32; }
+
+
+.footer {
+
+  text-align: center;
+
+  font-size: 10px;
+
+  margin-top: 10px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<div class="screen">
+
+
+<!-- ===== MENU ===== -->
+
+<div id="menu" class="menu">
+
+  <h1>📚 ARCADE DEL BIBLIOMAGO</h1>
+
+  <h2>TÉRTULO MABÓN</h2>
+
+
+  <button onclick="startGame()">▶ START GAME</button>
+
+  <button onclick="showRanking()">🏆 RECORDS</button>
+
+  <button onclick="showInstructions()">📜 INSTRUCCIONES</button>
+
+
+  <p style="text-align:center;margin-top:20px;">
+
+    “Todo sabio será probado en la biblioteca del destino”
+
+  </p>
+
+</div>
+
+
+
+<!-- ===== GAME ===== -->
+
+<div id="game" class="hidden">
+
+  <div class="stats">
+
+    <div>Vidas: <span id="lives">❤️❤️❤️</span></div>
+
+    <div>Puntos: <span id="score">0</span></div>
+
+  </div>
+
+
+  <div class="pixel-box" id="clue"></div>
+
+
+  <div class="options">
+
+    <button onclick="checkAnswer(0)" id="opt0"></button>
+
+    <button onclick="checkAnswer(1)" id="opt1"></button>
+
+    <button onclick="checkAnswer(2)" id="opt2"></button>
+
+    <button onclick="checkAnswer(3)" id="opt3"></button>
+
+  </div>
+
+</div>
+
+
+
+<!-- ===== NAME INPUT ===== -->
+
+<div id="nameScreen" class="hidden">
+
+  <h2>Has entrado al TOP 7 🧙‍♂️</h2>
+
+  <p>Escribe tu nombre para guardarlo en los registros:</p>
+
+  <input id="playerName" placeholder="Tu nombre..." style="width:100%;padding:10px;font-family:'Press Start 2P'">
+
+  <button onclick="saveScore()">GUARDAR</button>
+
+</div>
+
+
+
+<!-- ===== RANKING ===== -->
+
+<div id="ranking" class="hidden">
+
+  <h2>🏆 TOP 7 LECTORES</h2>
+
+  <div class="ranking" id="rankingList"></div>
+
+  <button onclick="goMenu()">Volver</button>
+
+</div>
+
+
+
+<!-- ===== INSTRUCTIONS ===== -->
+
+<div id="instructions" class="hidden">
+
+  <h2>📜 INSTRUCCIONES</h2>
+
+  <p>Adivina el libro usando la pista proporcionada.</p>
+
+  <p>Selecciona entre 4 opciones.</p>
+
+  <p>✅ Acierto: +100 puntos</p>
+
+  <p>❌ Error: Pierdes una vida</p>
+
+  <p>Si entras al TOP 7 podrás registrar tu nombre.</p>
+
+  <button onclick="goMenu()">Volver</button>
+
+</div>
+
+
+<div class="footer">Librería Tertulia © – Arcade Retro</div>
+
+
+</div>
+
+
+
+<script>
+
+const questions = [
+
+  { clue: "Una biblioteca infinita que contiene todos los libros posibles", options: ["La biblioteca de Babel","El nombre del viento","1984","La sombra del viento"], correct: 0 },
+
+  { clue: "Un mundo donde los libros están prohibidos", options: ["1984","Fahrenheit 451","Un mundo feliz","Dune"], correct: 1 },
+
+  { clue: "Un niño mago con cicatriz en la frente", options: ["El Hobbit","Percy Jackson","Harry Potter","Narnia"], correct: 2 },
+
+  { clue: "Un anillo que domina a todos", options: ["Eragon","El Señor de los Anillos","It","Juego de Tronos"], correct: 1 },
+
+  { clue: "Un hotel y una presencia oscura", options: ["El Resplandor","Misery","Drácula","Carrie"], correct: 0 },
+
+  { clue: "Un virus destruye la humanidad", options: ["Soy leyenda","Metro 2033","La carretera","Maze Runner"], correct: 0 },
+
+  { clue: "Una competencia mortal entre distritos", options: ["Divergente","Battle Royale","Los juegos del hambre","Maze Runner"], correct: 2 },
+
+  { clue: "Un músico pelirrojo cuenta su historia", options: ["Fundación","El nombre del viento","Elantris","Dune"], correct: 1 },
+
+  { clue: "Libros ocultos en un cementerio", options: ["El perfume","La sombra del viento","Inferno","El código Da Vinci"], correct: 1 },
+
+  { clue: "Un payaso aterroriza un pueblo", options: ["Cujo","Carrie","It","Salem’s Lot"], correct: 2 }
+
+];
+
+
+let index = 0;
+
+let score = 0;
+
+let lives = 3;
+
+let ranking = JSON.parse(localStorage.getItem("rankingLibro")) || [];
+
+
+function startGame() {
+
+  index = 0; score = 0; lives = 3;
+
+  document.getElementById("menu").classList.add("hidden");
+
+  document.getElementById("game").classList.remove("hidden");
+
+  loadQuestion();
+
+}
+
+
+function loadQuestion() {
+
+  if(index >= questions.length || lives <= 0){
+
+    endGame();
+
+    return;
+
+  }
+
+
+  let q = questions[index];
+
+  document.getElementById("clue").innerText = q.clue;
+
+  q.options.forEach((opt,i)=>{
+
+    document.getElementById("opt"+i).innerText = opt;
+
+  });
+
+
+  updateStats();
+
+}
+
+
+function updateStats(){
+
+  document.getElementById("score").innerText = score;
+
+  document.getElementById("lives").innerText = "❤️".repeat(lives);
+
+}
+
+
+function checkAnswer(i){
+
+  if(i === questions[index].correct){
+
+    score += 100;
+
+  } else {
+
+    lives--;
+
+  }
+
+  index++;
+
+  loadQuestion();
+
+}
+
+
+function endGame(){
+
+  document.getElementById("game").classList.add("hidden");
+
+
+  if(ranking.length < 7 || score > ranking[ranking.length-1].score){
+
+    document.getElementById("nameScreen").classList.remove("hidden");
+
+  } else{
+
+    showRanking();
+
+  }
+
+}
+
+
+function saveScore(){
+
+  let name = document.getElementById("playerName").value || "Anónimo";
+
+  ranking.push({name,score});
+
+  ranking.sort((a,b)=>b.score-a.score);
+
+  ranking = ranking.slice(0,7);
+
+  localStorage.setItem("rankingLibro", JSON.stringify(ranking));
+
+  showRanking();
+
+}
+
+
+function showRanking(){
+
+  document.getElementById("nameScreen")?.classList.add("hidden");
+
+  document.getElementById("menu").classList.add("hidden");
+
+  document.getElementById("ranking").classList.remove("hidden");
+
+
+  let list = document.getElementById("rankingList");
+
+  list.innerHTML = "";
+
+
+  ranking.forEach((r,i)=>{
+
+    const div = document.createElement("div");
+
+    if(i===0) div.classList.add("gold"), div.innerHTML = `🥇 Gran Erudito Arcano — ${r.name} (${r.score})`;
+
+    else if(i===1) div.classList.add("silver"), div.innerHTML = `🥈 Bibliomago Supremo — ${r.name} (${r.score})`;
+
+    else if(i===2) div.classList.add("bronze"), div.innerHTML = `🥉 Aprendiz Ilustre — ${r.name} (${r.score})`;
+
+    else div.innerHTML = `📚 ${r.name} — ${r.score}`;
+
+    list.appendChild(div);
+
+  });
+
+}
+
+
+function showInstructions(){
+
+  document.getElementById("menu").classList.add("hidden");
+
+  document.getElementById("instructions").classList.remove("hidden");
+
+}
+
+
+function goMenu(){
+
+  document.getElementById("ranking").classList.add("hidden");
+
+  document.getElementById("instructions").classList.add("hidden");
+
+  document.getElementById("menu").classList.remove("hidden");
+
+}
+
+</script>
+
+
+</body>
+
+</html>
+}
